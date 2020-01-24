@@ -1,0 +1,48 @@
+-*- mode: org; word-wrap: t; eval: (auto-fill-mode t); fill-column: 120; -*-
+#+TODO: WIP TODO WISH DESIGN DONE
+* Persistent entities with pure FP
+** How it should work
+Properties of Lagom persistent entities
+
+*** Sending a command
+
+A command is sent to an "Actor". Sending a message is synchronous but you don't receive a reply, rather the message is
+queued in the actor's mailbox. More specifically it is done via an ASK
+
+def ask[Cmd <: Command with PersistentEntity.ReplyType[_]](command: Cmd): Future[command.ReplyType]
+
+Now an ask is a kind of state machine, it will spawn an actor just to send the command and then wait for the entity to
+send a reply, presumably handling timeouts and retries. TODO ?
+
+For our persistent entity then the command sending should be async. We should be have an API that lets us send a command
+and at some point in the future we will receive a response
+
+In other words a non blocking call that needs someway to get a reference to the entity.
+
+*** Read only commands
+
+As well as commands that modify state and cause events (that are persisted) we also would like read only commands. These
+don't produce events and only act to ask the entity for information (from the current state). Essentially this is the
+same interface as the write commands except that it's a different type.
+
+*** Finding an entity
+
+Obviously we need a way to find an entity. We want it to be thread safe. It should do the following:
+
+We need an entity manager. It knows what entities are up and running (by ID). It can create entities. It can return you
+the entity's message queue so you can send commands to it. (Note that can we can abstract the queue itself, but most
+likely that will be the underlying representation.
+
+*** What is an entity
+
+An entity will be a fibre running in memory. It will consist of a queue that we send commands to and a persistent entity
+including state. It will have access to a permanent store adding new events. On initialization it will have access to a
+stream of events from the store that it can run to generate the current state.
+
+*** Event store API
+
+getEvents(ID) : Stream Event
+
+
+
+
