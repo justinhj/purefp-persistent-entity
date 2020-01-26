@@ -41,7 +41,10 @@ stream of events from the store that it can run to generate the current state.
 
 *** Event store API
 
-getEvents(ID) : Stream Event
+readEvents(ID) : Stream Event
+writeEvents : Task
+writeEvent : Task
+
 
 
 

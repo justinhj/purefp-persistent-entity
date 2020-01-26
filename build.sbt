@@ -66,11 +66,11 @@ libraryDependencies ++= Seq(
   // scalaz
   "dev.zio" %% "zio" % ZIOVersion,
   "dev.zio" %% "zio-streams" % ZIOVersion,
+  "dev.zio" %% "zio-interop" % ZIOVersion,
   // type classes
   "com.github.mpilquist" %% "simulacrum" % "0.12.0",
   // li haoyi ammonite repl embed
   "com.lihaoyi" % "ammonite" % "1.6.7" % "test" cross CrossVersion.full
-
 )
 
 //ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
