@@ -66,7 +66,7 @@ libraryDependencies ++= Seq(
   // scalaz
   "dev.zio" %% "zio" % ZIOVersion,
   "dev.zio" %% "zio-streams" % ZIOVersion,
-  "dev.zio" %% "zio-interop" % ZIOVersion,
+  "dev.zio" %% "zio-interop-cats" % "2.0.0.0-RC9",
   // type classes
   "com.github.mpilquist" %% "simulacrum" % "0.12.0",
   // li haoyi ammonite repl embed

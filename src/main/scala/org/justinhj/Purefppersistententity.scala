@@ -1,8 +1,8 @@
 package org.justinhj
 
-import zio.{App, Queue, UIO, Ref}
+import zio.{App, Queue, UIO, Ref, ZIO}
 import zio.console._
-import zio.interop.cats._
+import zio.interop.catz._
 import java.time.Instant
 import cats.implicits._
 
@@ -34,6 +34,9 @@ trait PersistentEntity[ID, T <: PersistentEntity[ID, T]] {
       // Save events... if saved events
       curState <- state.get;
       _ <- state.set(processEvents(events, curState));
+      s <- state.get;
+      d <- ZIO.descriptor;
+      _ = println(s"State $s Fibre ${d.id}");
       _ <- commandLoop(state, queue)
     ) yield ()
   }
@@ -113,13 +116,15 @@ object Purefppersistententity extends App {
   )
 
   def run(args: List[String]) =
-    myAppLogic.fold(_ => 1, _ => 0)
+    myAppLogic.map(_ => 0)
 
   val myAppLogic = {
-    for {
+    val r = for {
       eventQueue <- sampleAccount.start();
       _ <- putStrLn("Sending events...");
-      command <- commands.map(eventQueue.offer(_)).sequence
+      command <- commands.map{eventQueue.offer(_)}.sequence
     } yield ()
+
+    r
   }
 }
