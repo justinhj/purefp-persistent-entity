@@ -1,9 +1,8 @@
 -*- mode: org; word-wrap: t; eval: (auto-fill-mode t); fill-column: 120; -*-
 #+TODO: WIP TODO WISH DESIGN DONE
 * Persistent entities with pure FP
-** How it should work
+** Technical design
 Properties of Lagom persistent entities
-
 *** Sending a command
 
 A command is sent to an "Actor". Sending a message is synchronous but you don't receive a reply, rather the message is
@@ -44,8 +43,33 @@ stream of events from the store that it can run to generate the current state.
 readEvents(ID) : Stream Event
 writeEvents : Task
 writeEvent : Task
+*** subscribe model and manager
+So what I did at first works fine but there's no way to get the response from the entity!
 
 
 
 
+** References
+*** ZIO documentation https://zio.dev/docs
+*** Building kafka with Zio https://scalac.io/build-your-own-kafka-in-zio-queues-fibers/
+Learnings
+call queue "queueM" when it is flatmapped
+case class Consumer[A](title: String) {
+  val queueM = Queue.bounded[A](10)
+
+  def run = for {
+    queue <- queueM
+    loop = for {
+      img <- queue.take
+      _ <- putStrLn(s"[$title] worker: Starting analyzing task $img")
+      _ <- ZIO.sleep(Duration(Random.nextInt(4), TimeUnit.SECONDS))
+      _ <- putStrLn(s"[$title] worker: Finished task $img")
+    } yield ()
+    fiber <- loop.forever.fork
+  } yield (queue, fiber)
+}
+
+object Consumer {
+  def createM[A](title: String) = UIO.succeed(Consumer[A](title))
+}
 
