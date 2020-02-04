@@ -1,6 +1,6 @@
 package org.justinhj
 
-import zio.{App, Queue, UIO, Ref, ZIO}
+import zio.{App, ZIO}
 import zio.console._
 import zio.interop.catz._
 import java.time.Instant
@@ -88,7 +88,8 @@ object Purefppersistententity extends App {
   val myAppLogic = {
     val r = for {
       eventQueue <- sampleAccount.run();
-      _ <- putStrLn("Sending events...");
+      fd <- ZIO.descriptor;
+      _ <- putStr(s"Sending commands on fiber ${fd.id}");
       command <- commands.map{eventQueue.offer(_)}.sequence
     } yield ()
 
